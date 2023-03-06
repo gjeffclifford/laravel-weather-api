@@ -14,10 +14,10 @@ class PlaceService {
     $this->key = env("GEO_APIFY_KEY");
   }
 
-  public function getPlaces($search) {
+  public function getPlaces($search): string {
+    $queryParams = $this->convertToQueryParams($search);
     $client = new Client();
-
-    $response = $client->request('GET', "{$this->url}/geocode/search?text=$search&apiKey={$this->key}", [
+    $response = $client->request('GET', "{$this->url}/geocode/search?$queryParams", [
           'headers' => [
             'accept' => 'application/json',
           ],
@@ -25,5 +25,12 @@ class PlaceService {
 
     return $response->getBody()->getContents();
       
+  }
+
+  private function convertToQueryParams($search) {
+    return http_build_query([
+      'apiKey' => $this->key,
+      'text' => $search,
+    ]);
   }
 }
